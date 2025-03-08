@@ -1,0 +1,846 @@
+openapi: 3.0.3
+info:
+  title: API de Gerenciamento de Currículos da Sala Mineira
+  version: 1.0.0
+  description: API para gerenciar currículos e facilitar a distribuição de candidatos
+    para empregadores através do serviço da Sala Mineira. Este sistema permite o processamento
+    eficiente, o acompanhamento e a gestão das candidaturas na região.
+paths:
+  /api/token/:
+    post:
+      operationId: api_token_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenObtainPair'
+          description: ''
+  /api/token/refresh/:
+    post:
+      operationId: api_token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/token/verify/:
+    post:
+      operationId: api_token_verify_create
+      description: |-
+        Takes a token and indicates if it is valid.  This view provides no
+        information about a token's fitness for a particular use.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenVerify'
+          description: ''
+  /api/v1/candidates/:
+    get:
+      operationId: api_v1_candidates_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCandidateList'
+          description: ''
+    post:
+      operationId: api_v1_candidates_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Candidate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Candidate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Candidate'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Candidate'
+          description: ''
+  /api/v1/candidates/{id}/:
+    get:
+      operationId: api_v1_candidates_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this Candidato.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Candidate'
+          description: ''
+    put:
+      operationId: api_v1_candidates_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this Candidato.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Candidate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Candidate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Candidate'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Candidate'
+          description: ''
+    patch:
+      operationId: api_v1_candidates_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this Candidato.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCandidate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCandidate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCandidate'
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Candidate'
+          description: ''
+    delete:
+      operationId: api_v1_candidates_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this Candidato.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/v1/users/:
+    get:
+      operationId: api_v1_users_list
+      description: List all users.
+      summary: List all users.
+      parameters:
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - in: query
+        name: is_staff
+        schema:
+          type: boolean
+      - in: query
+        name: is_superuser
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - User
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserList'
+          description: ''
+    post:
+      operationId: api_v1_users_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/v1/users/{id}/:
+    get:
+      operationId: api_v1_users_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this Usuário.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: api_v1_users_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this Usuário.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: api_v1_users_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this Usuário.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    delete:
+      operationId: api_v1_users_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this Usuário.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+components:
+  schemas:
+    Address:
+      type: object
+      properties:
+        street:
+          type: string
+          maxLength: 255
+        number:
+          type: string
+          maxLength: 10
+        complement:
+          type: string
+          nullable: true
+          maxLength: 255
+        neighborhood:
+          type: string
+          maxLength: 255
+        zip_code:
+          type: string
+          readOnly: true
+        city:
+          type: string
+        state:
+          type: string
+          readOnly: true
+      required:
+      - city
+      - neighborhood
+      - number
+      - state
+      - street
+      - zip_code
+    Candidate:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          readOnly: true
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        first_name:
+          type: string
+          maxLength: 255
+        last_name:
+          type: string
+          maxLength: 255
+        date_of_birth:
+          type: string
+          format: date
+        gender:
+          type: string
+        cpf:
+          type: string
+          readOnly: true
+        rg:
+          type: string
+          readOnly: true
+        has_disability:
+          type: boolean
+        disability_description:
+          type: string
+          nullable: true
+        has_drivers_license:
+          type: boolean
+          title: Has driver's license
+        drivers_license_category:
+          type: string
+        is_first_job:
+          type: boolean
+        is_currently_employed:
+          type: boolean
+        profile_picture:
+          type: string
+          format: uri
+          nullable: true
+        contact:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
+        address:
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
+        social_network_profile:
+          type: array
+          items:
+            $ref: '#/components/schemas/SocialNetworkProfile'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - cpf
+      - created_at
+      - date_of_birth
+      - drivers_license_category
+      - first_name
+      - gender
+      - id
+      - last_name
+      - rg
+      - updated_at
+      - url
+    Contact:
+      type: object
+      properties:
+        phone_number:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          nullable: true
+          title: E-mail
+          maxLength: 254
+      required:
+      - phone_number
+    PaginatedCandidateList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Candidate'
+    PaginatedUserList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+    PatchedCandidate:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          readOnly: true
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        first_name:
+          type: string
+          maxLength: 255
+        last_name:
+          type: string
+          maxLength: 255
+        date_of_birth:
+          type: string
+          format: date
+        gender:
+          type: string
+        cpf:
+          type: string
+          readOnly: true
+        rg:
+          type: string
+          readOnly: true
+        has_disability:
+          type: boolean
+        disability_description:
+          type: string
+          nullable: true
+        has_drivers_license:
+          type: boolean
+          title: Has driver's license
+        drivers_license_category:
+          type: string
+        is_first_job:
+          type: boolean
+        is_currently_employed:
+          type: boolean
+        profile_picture:
+          type: string
+          format: uri
+          nullable: true
+        contact:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
+        address:
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
+        social_network_profile:
+          type: array
+          items:
+            $ref: '#/components/schemas/SocialNetworkProfile'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedUser:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          readOnly: true
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        first_name:
+          type: string
+          title: Primeiro nome
+          maxLength: 150
+        last_name:
+          type: string
+          title: Último nome
+          maxLength: 150
+        username:
+          type: string
+          title: Usuário
+          description: Obrigatório. 150 caracteres ou menos. Letras, números e @/./+/-/_
+            apenas.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: E-mail
+          maxLength: 254
+        password:
+          type: string
+          writeOnly: true
+          title: Senha
+          maxLength: 128
+        is_active:
+          type: boolean
+          title: Ativo
+          description: Indica que o usuário será tratado como ativo. Ao invés de excluir
+            contas de usuário, desmarque isso.
+        is_staff:
+          type: boolean
+          title: Membro da equipe
+          description: Indica que usuário consegue acessar este site de administração.
+        is_superuser:
+          type: boolean
+          title: Status de superusuário
+          description: Indica que este usuário tem todas as permissões sem atribuí-las
+            explicitamente.
+        last_login:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          title: Último login
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Data de registro
+    SocialNetworkProfile:
+      type: object
+      properties:
+        social_network:
+          type: string
+        url_social_network:
+          type: string
+          readOnly: true
+      required:
+      - social_network
+      - url_social_network
+    TokenObtainPair:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          readOnly: true
+      required:
+      - access
+      - password
+      - refresh
+      - username
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          writeOnly: true
+      required:
+      - access
+      - refresh
+    TokenVerify:
+      type: object
+      properties:
+        token:
+          type: string
+          writeOnly: true
+      required:
+      - token
+    User:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          readOnly: true
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        first_name:
+          type: string
+          title: Primeiro nome
+          maxLength: 150
+        last_name:
+          type: string
+          title: Último nome
+          maxLength: 150
+        username:
+          type: string
+          title: Usuário
+          description: Obrigatório. 150 caracteres ou menos. Letras, números e @/./+/-/_
+            apenas.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: E-mail
+          maxLength: 254
+        password:
+          type: string
+          writeOnly: true
+          title: Senha
+          maxLength: 128
+        is_active:
+          type: boolean
+          title: Ativo
+          description: Indica que o usuário será tratado como ativo. Ao invés de excluir
+            contas de usuário, desmarque isso.
+        is_staff:
+          type: boolean
+          title: Membro da equipe
+          description: Indica que usuário consegue acessar este site de administração.
+        is_superuser:
+          type: boolean
+          title: Status de superusuário
+          description: Indica que este usuário tem todas as permissões sem atribuí-las
+            explicitamente.
+        last_login:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          title: Último login
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Data de registro
+      required:
+      - date_joined
+      - email
+      - first_name
+      - id
+      - last_login
+      - last_name
+      - password
+      - url
+      - username
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
